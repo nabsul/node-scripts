@@ -16,14 +16,10 @@ const putObject = ( key, data, callback ) => {
 		Body: data,
 	};
 
-	s3To.upload( params )
-		.on('httpUploadProgress', ( evt ) => {
-			console.log(evt);
-		} )
-		.send( ( err, result ) => {
-			console.log(err, result);
-			callback( err, result );
-		});
+	s3To.upload( params ).send( ( err, result ) => {
+		console.log( result );
+		callback( err, result );
+	} );
 };
 
 const copyObject = ( obj, callback ) => {

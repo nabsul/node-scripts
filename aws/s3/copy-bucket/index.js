@@ -1,3 +1,4 @@
+const AWS = require( 'aws-sdk' );
 const Async = require( 'async' );
 const getClient = require( './get-client' );
 const getObjects = require( './get-objects' );
@@ -8,33 +9,33 @@ const s3To = getClient( settings.destination );
 
 const putObject = ( key, data, callback ) => {
 	console.log( 'putting ' + key );
-	s3To.putObject( {
+
+	const params = {
 		Bucket: settings.destination.bucket,
 		Key: key,
 		Body: data,
-	}, ( err ) => {
-		if ( err ) {
-			return callback( err );
-		}
+	};
 
-		console.log( 'success: ' + key );
-		callback( null, 'success: ' + key );
-	} ) ;
+	s3To.upload( params )
+		.on('httpUploadProgress', ( evt ) => {
+			console.log(evt);
+		} )
+		.send( ( err, result ) => {
+			console.log(err, result);
+			callback( err, result );
+		});
 };
 
 const copyObject = ( obj, callback ) => {
 	console.log( 'downloading: ' + obj.Key );
-	s3From.getObject( {
+	const request = {
 		Bucket: settings.source.bucket,
 		Key: obj.Key,
-	}, ( err, data ) => {
-		if ( err ) {
-			callback( err );
-		}
+	};
 
-		console.log( 'uploading: ' + obj.Key );
-		putObject( obj.Key, data.Body, callback );
-	} );
+	const stream = s3From.getObject( request ).createReadStream();
+	console.log( 'uploading: ' + obj.Key );
+	putObject( obj.Key, stream, callback );
 };
 
 const handleObjects = ( err, data ) => {

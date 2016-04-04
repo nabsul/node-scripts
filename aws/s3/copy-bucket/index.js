@@ -43,7 +43,7 @@ const handleObjects = ( err, data ) => {
 	}
 
 	const tasks = data.map( d => ( cb ) => copyObject( d, cb ) );
-	Async.parallelLimit( tasks, 2, ( err, data ) => {
+	Async.series( tasks, ( err, data ) => {
 		if ( err ) {
 			throw err;
 		}

@@ -1,0 +1,14 @@
+{
+	"source": {
+		"id": "",
+		"key": "",
+		"region": "",
+		"bucket": ""
+	},
+	"destination": {
+		"id": "",
+		"key": "",
+		"region": "",
+		"bucket": ""
+	}
+}

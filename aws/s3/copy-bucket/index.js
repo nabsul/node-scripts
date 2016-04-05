@@ -1,4 +1,3 @@
-const AWS = require( 'aws-sdk' );
 const Async = require( 'async' );
 const getClient = require( './get-client' );
 const getObjects = require( './get-objects' );
@@ -8,8 +7,6 @@ const s3From = getClient( settings.source );
 const s3To = getClient( settings.destination );
 
 const putObject = ( key, data, callback ) => {
-	console.log( 'putting ' + key );
-
 	const params = {
 		Bucket: settings.destination.bucket,
 		Key: key,
@@ -17,20 +14,19 @@ const putObject = ( key, data, callback ) => {
 	};
 
 	s3To.upload( params ).send( ( err, result ) => {
-		console.log( result );
+		console.log( 'Complete: ' + key );
 		callback( err, result );
 	} );
 };
 
 const copyObject = ( obj, callback ) => {
-	console.log( 'downloading: ' + obj.Key );
+	console.log( 'Copying: ' + obj.Key );
 	const request = {
 		Bucket: settings.source.bucket,
 		Key: obj.Key,
 	};
 
 	const stream = s3From.getObject( request ).createReadStream();
-	console.log( 'uploading: ' + obj.Key );
 	putObject( obj.Key, stream, callback );
 };
 
@@ -45,8 +41,8 @@ const handleObjects = ( err, data ) => {
 			throw err;
 		}
 
+		console.log( 'all complete.' );
 		console.dir( data );
-		console.log( 'complete' );
 	} );
 };
 

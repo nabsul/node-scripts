@@ -1,18 +1,17 @@
-const fs = require( 'fs' );
-const Handlebars = require( 'handlebars' );
+'use strict';
+const xml2js = require( 'xml2js' );
+const template = require( './feed' );
 
-module.exports.urlPrefix = '';
+const dayLookup = [ 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat' ];
+const monthLookup = [ 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec' ];
 
-var dayLookup = [ 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-var monthLookup = [ 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec' ];
-
-function zeros( num, width ) {
+const zeros = ( num, width ) => {
 	var res = num.toString();
 	while (res.length < width) { res = '0' + res; }
 	return res;
-}
+};
 
-function pubDateFormat ( timeStamp ) {
+const pubDateFormat = ( timeStamp ) => {
 	var date = new Date( timeStamp );
 	var day = dayLookup[ date.getDay() ];
 	var dayOfMonth = zeros( date.getDate(), 2 );
@@ -22,50 +21,39 @@ function pubDateFormat ( timeStamp ) {
 	var min = zeros( date.getMinutes(), 2 );
 	var sec = zeros( date.getSeconds(), 2 );
 	return day + ', ' + dayOfMonth + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec + ' GMT';
-}
+};
 
-var getItems = ( items ) => {
-	var result = [];
-	var iteration = 0;
-	var startDate = Date.now() - 365 * 24 * 60 * 60 * 1000;
-	items.forEach( ( i ) => {
+const getItems = ( items ) => {
+	let iteration = 0;
+	const startDate = Date.now() - 365 * 24 * 60 * 60 * 1000;
+	return items.map( item => {
 		iteration = iteration + 48 * 60 * 60 * 1000;
-		var parts = i.Key.split( '/' );
-		var name = parts[ 2 ].split( '.' )[0];
-		result.push({
+		var name = item.split( '.' )[0];
+		return {
 			title: name,
 			author: name,
 			subtitle: name,
 			summary: name,
-			url: module.exports.urlPrefix + i.Key,
-			length: i.Size,
+			url: 'http://' + item,
+			length: 1,
 			type: 'audio/mp3',
-			guid: module.exports.urlPrefix + i.Key,
+			guid: module.exports.urlPrefix + item.Key,
 			date: pubDateFormat(startDate + iteration ),
 			//duration: '1:00:00',
-		} );
+		};
 	} );
-
-	return result;
 };
 
-module.exports = ( items ) => {
-	const content = fs.readFileSync( './feed.xml.template' ).toString();
-	const template = Handlebars.compile( content );
-
-	var parts = items[ 0 ].Key.split( '/' );
-	var folder = parts[ 1 ];
-	var link = '';
-
+module.exports = ( items, config ) => {
 	var data = {
-		title: folder,
-		link: link,
-		copyright: '',
-		subtitle: folder,
-		author: '',
-		summary: folder,
-		description: folder,
-		email: '',
+		title: config.title,
+		link: config.link,
+		copyright: config.author,
+		subtitle: config.title,
+		author: config.author,
+		summary: config.title,
+		description: config.title,
+		email: config.email,
 		categories: [
 			{
 				category: 'Technology'
@@ -74,5 +62,8 @@ module.exports = ( items ) => {
 		items: getItems( items ),
 	};
 
-	return template( data );
+
+	const xml = template( data );
+	const builder = new xml2js.Builder();
+	return builder.buildObject( xml );
 };

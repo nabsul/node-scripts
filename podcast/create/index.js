@@ -1,5 +1,9 @@
 const create = require( './createPodcast' );
-var feedParams = require( './config.json' );
+const feedParams = require( './config.json' );
+const fs = require( 'fs' );
 
-const content = create( dir, feedParams );
+const files = fs.readdirSync( feedParams.path );
 
+const content = create( files, feedParams );
+
+console.log( content );

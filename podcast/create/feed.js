@@ -1,29 +1,29 @@
-var categories = ( cats ) => {
+const categories = ( cats ) => {
 	return cats.map( ( c ) => {
 		return { $: { text: '' } };
 	} );
 };
 
-var items = ( items ) => {
-	return items.map( ( i ) => {
+const items = ( items ) => {
+	return items.map( item => {
 		return {
-			title: '',
-			'itunes:author': '',
-			'itunes:subtitle': '',
-			'itunes:summary': '',
+			title: item.title,
+			'itunes:author': item.author,
+			'itunes:subtitle': item.subtitle,
+			'itunes:summary': item.summary,
 			'itunes:image': {
-				$: { href: '' },
+				$: { href: item.url },
 			},
 			enclosure: {
 				$: {
-					url: '',
-					length: '',
-					type: '',
+					url: item.url,
+					length: item.length,
+					type: item.type,
 				}
 			},
-			guid: '',
-			pubDate: '',
-			'itunes:duration': '',
+			guid: item.guid,
+			pubDate: item.date,
+			'itunes:duration': 1,
 		};
 	} );
 };
@@ -40,16 +40,16 @@ module.exports = ( feed ) => {
 				link: feed.link,
 				language: feed.language ? feed.language : 'en-us',
 				copyright: feed.copyright,
-				'itunes:subtitle': '',
-				'itunes:author': '',
-				'itunes:summary': '',
-				'description': '',
+				'itunes:subtitle': feed.subtitle,
+				'itunes:author': feed.author,
+				'itunes:summary': feed.summary,
+				'description': feed.description,
 				'itunes:owner':{
-					'itunes:name': '',
-					'itunes:email': '',
+					'itunes:name': feed.author,
+					'itunes:email': feed.email,
 				},
 				'itunes:image': {
-					$: { href: '' },
+					$: { href: feed.link },
 				},
 				'itunes:explicit': 'no',
 				'itunes:category': categories( feed.categories ),

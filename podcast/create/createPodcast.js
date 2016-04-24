@@ -23,7 +23,7 @@ const pubDateFormat = ( timeStamp ) => {
 	return day + ', ' + dayOfMonth + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec + ' GMT';
 };
 
-const getItems = ( items ) => {
+const getItems = ( items, config ) => {
 	let iteration = 0;
 	const startDate = Date.now() - 365 * 24 * 60 * 60 * 1000;
 	return items.map( item => {
@@ -34,10 +34,10 @@ const getItems = ( items ) => {
 			author: name,
 			subtitle: name,
 			summary: name,
-			url: 'http://' + item,
+			url: config.urlPrefix + item,
 			length: 1,
 			type: 'audio/mp3',
-			guid: module.exports.urlPrefix + item.Key,
+			guid: item,
 			date: pubDateFormat(startDate + iteration ),
 			//duration: '1:00:00',
 		};
@@ -55,11 +55,9 @@ module.exports = ( items, config ) => {
 		description: config.title,
 		email: config.email,
 		categories: [
-			{
-				category: 'Technology'
-			},
+			'Technology',
 		],
-		items: getItems( items ),
+		items: getItems( items, config ),
 	};
 
 

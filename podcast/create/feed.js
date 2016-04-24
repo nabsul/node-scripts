@@ -1,6 +1,6 @@
 const categories = ( cats ) => {
 	return cats.map( ( c ) => {
-		return { $: { text: '' } };
+		return { $: { text: c } };
 	} );
 };
 
@@ -21,7 +21,7 @@ const items = ( items ) => {
 					type: item.type,
 				}
 			},
-			guid: item.guid,
+			guid: item.url,
 			pubDate: item.date,
 			'itunes:duration': 1,
 		};
@@ -33,9 +33,17 @@ module.exports = ( feed ) => {
 		rss: {
 			$: {
 				'xmlns:itunes': 'http://www.itunes.com/dtds/podcast-1.0.dtd',
+				'xmlns:atom': 'http://www.w3.org/2005/Atom',
 				version: '2.0',
 			},
 			channel: {
+				'atom:link': {
+					$: {
+						href: feed.link,
+						rel: 'self',
+						type: 'application/rss+xml',
+					}
+				},
 				title: feed.title,
 				link: feed.link,
 				language: feed.language ? feed.language : 'en-us',
